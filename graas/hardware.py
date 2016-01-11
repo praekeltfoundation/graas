@@ -41,7 +41,8 @@ class AsyncIO(object):
         :param int pin: The number of the pin to set
         :param value: Either LOW or HIGH
         '''
-        if pin in self.pin_state and self.pin_state[pin]['mode'] == self.OUTPUT:
+        if (pin in self.pin_state and
+                self.pin_state[pin]['mode'] == self.OUTPUT):
             self.GPIO.output(pin, value)
             self.pin_state[pin]['value'] = value
             return succeed(None)
@@ -83,3 +84,17 @@ class AsyncIO(object):
         yield self.output(pin, value)
         yield task.deferLater(reactor, duration, self.output, pin, not value)
         returnValue(None)
+
+
+class GateRemote(object):
+    def __init__(self, pin, simulate=False):
+        if simulate:
+            from graas.tests.helpers import TestGPIO as GPIO
+        else:
+            import RPi.GPIO as GPIO
+        self._asyncio = AsyncIO(GPIO)
+        self._gate_remote_pin = pin
+
+    def press(self):
+        return self._asyncio.pulse(
+            self._gate_remote_pin, self._asyncio.HIGH, 0.5)

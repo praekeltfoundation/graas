@@ -14,6 +14,9 @@ class GraasApi(object):
     app = Klein()
     static_path = pkg_resources.resource_filename(__name__, "static")
 
+    def __init__(self, gate_remote):
+        self._gate_remote = gate_remote
+
     @app.route('/')
     def home(self, request):
         p = FilePath(self.static_path).child("index.html")
@@ -24,5 +27,8 @@ class GraasApi(object):
         return File(self.static_path)
 
     @app.route('/action/press', methods=['POST'])
+    @inlineCallbacks
     def action_press(self, request):
-        return "Button pressed"
+        if self._gate_remote is not None:
+            yield self._gate_remote.press()
+        returnValue("Button pressed")
