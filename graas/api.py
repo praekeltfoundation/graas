@@ -4,7 +4,6 @@ import pkg_resources
 
 from klein import Klein
 
-from twisted.internet.defer import inlineCallbacks, returnValue
 from twisted.python.filepath import FilePath
 from twisted.web.static import File
 
@@ -27,8 +26,7 @@ class GraasApi(object):
         return File(self.static_path)
 
     @app.route('/action/press', methods=['POST'])
-    @inlineCallbacks
     def action_press(self, request):
         if self._gate_remote is not None:
-            yield self._gate_remote.press()
-        returnValue("Button pressed")
+            self._gate_remote.press()
+        return "Button pressed"
