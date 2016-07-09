@@ -22,6 +22,7 @@ setup(
         'click',
         'klein',
         'Twisted',
+        'autobahn',
     ],
     entry_points='''
     [console_scripts]
