@@ -86,15 +86,46 @@ class AsyncIO(object):
         returnValue(None)
 
 
+class IGateRemote(object):
+    """ Interface to a GateRemote. """
+
+    def ws_resource(self):
+        """ Return a web socket resource for clients to connect to (or None).
+        """
+
+    def press(self):
+        """ Press the gate remote and return a deferred that fires when done.
+        """
+
+
 class GateRemote(object):
-    def __init__(self, pin, simulate=False):
-        if simulate:
-            from graas.tests.helpers import TestGPIO as GPIO
-        else:
-            import RPi.GPIO as GPIO
-        self._asyncio = AsyncIO(GPIO)
+    def __init__(self, pin, _gpio=None):
+        if _gpio is None:
+            import RPi.GPIO as _gpio
+        self._asyncio = AsyncIO(_gpio)
         self._gate_remote_pin = pin
+
+    def ws_resource(self):
+        None
 
     def press(self):
         return self._asyncio.pulse(
             self._gate_remote_pin, self._asyncio.HIGH, 0.5)
+
+
+class SimulatedGateRemote(GateRemote):
+    def __init__(self, pin):
+        from graas.tests.helpers import TestGPIO as _gpio
+        super(SimulatedGateRemote, self).__init__(pin, _gpio=_gpio)
+
+
+class ProxiedGateRemote(object):
+    def __init__(self):
+        from .wsproxy import graas_ws_resource
+        self._resource = graas_ws_resource()
+
+    def ws_resource(self):
+        return self._resource
+
+    def press(self):
+        print "Pressed"
