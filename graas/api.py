@@ -25,6 +25,10 @@ class GraasApi(object):
     def static(self, request):
         return File(self.static_path)
 
+    @app.route('/ws/', branch=True)
+    def websocket_resource(self, request):
+        return self._gate_remote.ws_resource()
+
     @app.route('/action/press', methods=['POST'])
     def action_press(self, request):
         if self._gate_remote is not None:
