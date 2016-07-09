@@ -9,7 +9,7 @@ from twisted.python import log
 from twisted.web.server import Site
 
 from .api import GraasApi
-from .hardware import GateRemote
+from .hardware import GateRemote, SimulatedGateRemote, ProxiedGateRemote
 
 
 @click.command("graas")
@@ -23,8 +23,13 @@ from .hardware import GateRemote
     type=int, default=8080,
     help='Port for web server to listen on')
 @click.option(
-    '--simulate/--live', default=True,
-    help='Specify --live to really drive the gate.'
+    '--mode', type=click.Choice(['simulate', 'live', 'proxy']),
+    default='simulate',
+    help=(
+        'Specify "simulate" to simulate a local gate remote. '
+        'Specify "live" to really drive a local gate remote. '
+        'Specify "proxy" to proxy requests to a GRaaS instance connected'
+        ' via a websocket.')
 )
 @click.option(
     '--gate-remote-pin', '-b',
@@ -35,16 +40,22 @@ from .hardware import GateRemote
     '--log-file', '-l',
     type=str, default=None,
     help='File to log to')
-def main(host, web_port, simulate, gate_remote_pin, log_file):
+def main(host, web_port, mode, gate_remote_pin, log_file):
     """ Vumi Go Opt Out API. """
     if log_file is None:
         log_file = sys.stdout
     log.startLogging(log_file)
 
-    gate_remote = GateRemote(gate_remote_pin, simulate=simulate)
-    graas_api = GraasApi(gate_remote)
+    if mode == "live":
+        gate_remote = GateRemote(gate_remote_pin)
+    elif mode == "proxy":
+        gate_remote = ProxiedGateRemote()
+    else:
+        gate_remote = SimulatedGateRemote(gate_remote_pin)
 
-    site = Site(graas_api.app.resource())
+    graas_api = GraasApi(gate_remote)
+    graas_resource = graas_api.app.resource()
+    site = Site(graas_resource)
     reactor.listenTCP(web_port, site, interface=host)
 
     log.msg("Web API listening on %s:%s" % (host, web_port))
