@@ -17,6 +17,7 @@ class GraasServerWsProtocol(WebSocketServerProtocol):
 
 
 def graas_ws_resource():
+    # TODO: set url to something sane?
     factory = WebSocketServerFactory(u"ws://127.0.0.1:8080")
     factory.protocol = GraasServerWsProtocol
     return WebSocketResource(factory)
