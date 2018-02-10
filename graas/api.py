@@ -30,6 +30,6 @@ class GraasApi(object):
 
     @app.route('/action/press', methods=['POST'])
     def action_press(self, request):
-        if self._gate_remote is not None:git branch
+        if self._gate_remote is not None:
             self._gate_remote.press()
         return self.load_index_page()
