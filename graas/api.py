@@ -12,14 +12,17 @@ class GraasApi(object):
 
     app = Klein()
     static_path = pkg_resources.resource_filename(__name__, "static")
+    p = FilePath(static_path).child("index.html")
 
     def __init__(self, gate_remote):
         self._gate_remote = gate_remote
 
+    def load_index_page(self):
+        return self.p.open().read()
+
     @app.route('/')
     def home(self, request):
-        p = FilePath(self.static_path).child("index.html")
-        return p.open().read()
+        return self.load_index_page()
 
     @app.route('/static/', branch=True)
     def static(self, request):
@@ -29,4 +32,4 @@ class GraasApi(object):
     def action_press(self, request):
         if self._gate_remote is not None:
             self._gate_remote.press()
-        return "Button pressed"
+        return self.load_index_page()
