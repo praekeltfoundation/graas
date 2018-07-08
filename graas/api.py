@@ -14,24 +14,13 @@ class GraasApi(object):
     def __init__(self, gate_remote):
         self._gate_remote = gate_remote
 
-    @app.route('/')
+    @app.route('/', methods=['POST', 'GET'])
     def home(self, request):
         message = ''
         message_type = ''
-        return HomePageElement(
-            'Graas', message=message, message_type=message_type)
+        pin = request.args.get('gatecode', [''])[0]
 
-    @app.route('/static/', branch=True)
-    def static(self, request):
-        return File(self.static_path)
-
-    @app.route('/action/press', methods=['POST'])
-    def action_press(self, request):
-        message = None
-        message_type = None
-
-        if self._gate_remote:
-            pin = request.args.get('gatecode', [''])[0]
+        if self._gate_remote and pin:
             if str(pin) == str(self._gate_remote._gate_remote_pin):
                 self._gate_remote.press()
                 message = 'Gate opened'
@@ -42,3 +31,7 @@ class GraasApi(object):
 
         return HomePageElement(
             'Graas', message=message, message_type=message_type)
+
+    @app.route('/static/', branch=True)
+    def static(self, request):
+        return File(self.static_path)

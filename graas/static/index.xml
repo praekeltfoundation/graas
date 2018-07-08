@@ -5,7 +5,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
 
-  <title></title>
+  <title>Graas</title>
 
   <link href="/static/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet"/>
   <link href="/static/css/graas.css" rel="stylesheet"/>
@@ -19,7 +19,7 @@
       </ul>
     </nav>
     <h3 class="text-muted" xmlns:t="http://twistedmatrix.com/ns/twisted.web.template/0.1">
-      <span t:render="name"></span>
+      <a href="/"><span t:render="name"></span></a>
     </h3>
   </div>
 
@@ -28,7 +28,7 @@
   </div>
 
   <div class="jumbotron">
-    <form action="/action/press" method="post">
+    <form action="/" method="post">
       <div class="form-group">
         <label for="gatecode">Gate Code</label>
         <input type="password"
