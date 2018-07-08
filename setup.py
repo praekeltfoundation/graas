@@ -6,6 +6,7 @@ def read_file(filename):
     filepath = os.path.join(os.path.dirname(__file__), filename)
     return open(filepath, 'r').read()
 
+
 setup(
     name='graas',
     version='0.0.1',
